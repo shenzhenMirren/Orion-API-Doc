@@ -285,6 +285,7 @@ function loadApiGroupAndApi(data) {
                 var deprecated = (api.deprecated != null && api.deprecated == true) ? "-deprecated " : "";//该接口是否已经过时
 
                 html += '<h2 id=\'' + api.apiId + '\' class="' + deprecated + '"><span class="point"></span>' + api.title + '</h2>';
+                html += '<div>' + api.description + '</div>';
 
                 html += '<div class="api-body' + deprecated + ' api-body' + styleMethod + '">';
                 // 请求方法 begin
@@ -300,7 +301,7 @@ function loadApiGroupAndApi(data) {
                 tryItOutData.consumes = api.consumes;
                 tryItOutData.produces = api.produces;
                 tryItOutData.parameters = api.parameters;
-                html += '<div class="api-item">' +
+                html += '<div class="api-item api-body-follow' + deprecated + ' follow' + styleMethod + '">' +
                     '<span class="api-item-sub ' + deprecated + '">#{scheme}://#{host}#{basePath}</span>' +
                     '<span class="api-item-sub ' + deprecated + '">' + api.path + '</span>' +
                     '<div>' +
@@ -308,8 +309,8 @@ function loadApiGroupAndApi(data) {
                     '<span class="url-copy url-copy-path" onclick="copyPath(this)">CopyPath</span>' +
                     '<span class="url-copy url-copy-path" onclick="tryItOut(this)" data=\'' + JSON.stringify(tryItOutData) + '\'>测试运行</span></div>' +
                     '</div>';
-                //URL信息 begin
-                html += '<div class="api-item api-body-follow' + deprecated + ' follow' + styleMethod + '">' + api.description + '</div>';
+                //URL信息 end
+
                 //请求参数 begin
                 html += '<div class="api-item">请求参数:<span style="float: right;">';
                 if (api.consumes != null && api.consumes.length > 0) {
@@ -337,7 +338,7 @@ function loadApiGroupAndApi(data) {
                         '</thead>' +
                         '<tbody>';
                     for (var j = 0; j < parameters.length; j++) {
-                        var p_required = parameters[j].required == true ? '是' : '否';
+                        var p_required = parameters[j].required == 'true' ? '是' : '否';
                         var p_name = parameters[j].name == null ? '' : parameters[j].name;
                         var p_type = parameters[j].type == null ? '' : parameters[j].type;
                         var p_in = parameters[j].in == null ? '' : parameters[j].in;
@@ -350,80 +351,77 @@ function loadApiGroupAndApi(data) {
                             '<td>' + p_description + '</td>' +
                             '</tr>';
                         //是否需要添加参数说明
-                        var isAddParamExplain = false;
-                        var txtParamExplain = '<tr><td></td><td colspan="4" class="pd5px">';
-                        txtParamExplain += '<div>参数说明:</div>';
-                        if (parameters[j].default != null) {
-                            isAddParamExplain = true;
-                            txtParamExplain += '<span class="pull-left background-color-white radius5px mleft10px pd5px10px inline-block">默认值: ' + parameters[j].default + '</span>';
-                        }
-                        if (parameters[j].enum != null) {
-                            var enums = parameters[j].enum;
-                            isAddParamExplain = true;
-                            txtParamExplain += '<span class="pull-left background-color-white radius5px mleft10px pd5px10px inline-block">枚举值: ';
-                            for (var es = 0; es < enums.length; es++) {
-                                if (es != 0) {
-                                    txtParamExplain += ' , ';
-                                }
-                                txtParamExplain += enums[es];
-                            }
-                            txtParamExplain += '</span>';
-                        }
-                        if (parameters[j].minLength != null && parameters[j].minLength != '') {
-                            isAddParamExplain = true;
-                            txtParamExplain += '<span class="pull-left background-color-white radius5px mleft10px pd5px10px inline-block">最小长度: ' + parameters[j].minLength + '</span>';
-                        }
-                        if (parameters[j].minimum != null && parameters[j].minimum != '') {
-                            isAddParamExplain = true;
-                            txtParamExplain += '<span class="pull-left background-color-white radius5px mleft10px pd5px10px inline-block">最小值: ' + parameters[j].minimum + '</span>';
-                        }
-                        if (parameters[j].maxLength != null && parameters[j].maxLength != '') {
-                            isAddParamExplain = true;
-                            txtParamExplain += '<span class="pull-left background-color-white radius5px mleft10px pd5px10px inline-block">最大长度: ' + parameters[j].maxLength + '</span>';
-                        }
-                        if (parameters[j].maximum != null && parameters[j].maximum != '') {
-                            isAddParamExplain = true;
-                            txtParamExplain += '<span class="pull-left background-color-white radius5px mleft10px pd5px10px inline-block">最大值: ' + parameters[j].maximum + '</span>';
-                        }
-                        txtParamExplain += '<div class="clearfix mb5px"></div>';
-                        if (parameters[j].pattern != null) {
-                            isAddParamExplain = true;
-                            txtParamExplain += '<span class="background-color-white radius5px mleft10px pd5px10px mb5px inline-block ">正则表达式: ' + parameters[j].pattern + '</span>';
-                        }
-                        if (parameters[j].format != null) {
-                            isAddParamExplain = true;
-                            txtParamExplain += '<span class="background-color-white radius5px mleft10px pd5px10px mb5px inline-block ">格式类型: ' + parameters[j].format + '</span>';
-                        }
-                        if (parameters[j].vendorExtensions != null && parameters[j].vendorExtensions.items != null) {
-                            var p_items = parameters[j].vendorExtensions.items;
-                            if (p_items.length > 0) {
+                        if (parameters[j].explain != null) {
+                            var isAddParamExplain = false;
+                            var txtParamExplain = '<tr><td></td><td colspan="4" class="pd5px">';
+                            txtParamExplain += '<div>参数说明:</div>';
+                            if (parameters[j].default != null) {
                                 isAddParamExplain = true;
-                                txtParamExplain +=
-                                    '<div class="table-responsive">' +
-                                    '<table class="table table-bordered">' +
-                                    '<thead>' +
-                                    '<tr>' +
-                                    '<th>参数类型</th>' +
-                                    '<th>参数名称</th>' +
-                                    '<th>参数描述</th>' +
-                                    '</tr>' +
-                                    '</thead>' +
-                                    '<tbody>';
-                                for (var itp = 0; itp < p_items.length; itp++) {
-                                    txtParamExplain +=
-                                        '<tr>' +
-                                        '<td>' + p_items[itp].type + '</td>' +
-                                        '<td>' + p_items[itp].name + '</td>' +
-                                        '<td>' + p_items[itp].description + '</td>' +
-                                        '</tr>';
-                                }
-                                txtParamExplain += '</tbody></table></div>';
+                                txtParamExplain += '<span class="pull-left background-color-white radius5px mleft10px pd5px10px inline-block">默认值: ' + parameters[j].default + '</span>';
                             }
-                        }
-                        txt += '</td></tr>';
+                            if (parameters[j].enum != null) {
+                                var enums = parameters[j].enum;
+                                isAddParamExplain = true;
+                                txtParamExplain += '<span class="pull-left background-color-white radius5px mleft10px pd5px10px inline-block">枚举值: ';
+                                for (var es = 0; es < enums.length; es++) {
+                                    if (es !== 0) {
+                                        txtParamExplain += ' , ';
+                                    }
+                                    txtParamExplain += enums[es];
+                                }
+                                txtParamExplain += '</span>';
+                            }
+                            let emin = parameters[j].explain.min;
+                            if (emin != null && emin !== '') {
+                                isAddParamExplain = true;
+                                txtParamExplain += '<span class="pull-left background-color-white radius5px mleft10px pd5px10px inline-block">最小: ' + emin + '</span>';
+                            }
+                            let emax = parameters[j].explain.max;
+                            if (emax != null && emax !== '') {
+                                isAddParamExplain = true;
+                                txtParamExplain += '<span class="pull-left background-color-white radius5px mleft10px pd5px10px inline-block">最大: ' + emax + '</span>';
+                            }
+                            txtParamExplain += '<div class="clearfix mb5px"></div>';
+                            let epattern = parameters[j].explain.pattern;
+                            if (epattern != null) {
+                                isAddParamExplain = true;
+                                txtParamExplain += '<span class="background-color-white radius5px mleft10px pd5px10px mb5px inline-block ">正则表达式: ' + epattern + '</span>';
+                            }
+                            if (parameters[j].format != null) {
+                                isAddParamExplain = true;
+                                txtParamExplain += '<span class="background-color-white radius5px mleft10px pd5px10px mb5px inline-block ">格式类型: ' + parameters[j].format + '</span>';
+                            }
+                            if (parameters[j].explain.items != null) {
+                                var p_items = parameters[j].explain.items;
+                                if (p_items.length > 0) {
+                                    isAddParamExplain = true;
+                                    txtParamExplain +=
+                                        '<div class="table-responsive">' +
+                                        '<table class="table table-bordered">' +
+                                        '<thead>' +
+                                        '<tr>' +
+                                        '<th>参数类型</th>' +
+                                        '<th>参数名称</th>' +
+                                        '<th>参数描述</th>' +
+                                        '</tr>' +
+                                        '</thead>' +
+                                        '<tbody>';
+                                    for (var itp = 0; itp < p_items.length; itp++) {
+                                        txtParamExplain +=
+                                            '<tr>' +
+                                            '<td>' + p_items[itp].type + '</td>' +
+                                            '<td>' + p_items[itp].name + '</td>' +
+                                            '<td>' + p_items[itp].description + '</td>' +
+                                            '</tr>';
+                                    }
+                                    txtParamExplain += '</tbody></table></div>';
+                                }
+                            }
+                            txt += '</td></tr>';
 
-                        if (isAddParamExplain) {
-                            txt += txtParamExplain;
+                            if (isAddParamExplain) {
+                                txt += txtParamExplain;
+                            }
                         }
 
                     }
@@ -447,16 +445,25 @@ function loadApiGroupAndApi(data) {
                     html +=
                         '<div class="table-responsive api-item api-body-follow' + deprecated + '  follow' + styleMethod + ' ">' +
                         '<table class="table table-bordered">' +
-                        '<thead><tr><th width="20%">参数类型</th><th width="30%">参数名称</th><th>参数描述</th></tr></thead><tbody>';
+                        '<thead><tr><th width="15%">参数类型</th><th width="25%">参数名称</th><th>参数描述</th></tr></thead><tbody>';
                     for (var vep = 0; vep < ve_ps.length; vep++) {
                         html += '<tr><td>' + ve_ps[vep].type + '</td><td>' + ve_ps[vep].name + '</td><td>' + ve_ps[vep].description + '</td>';
                         if ((ve_ps[vep].type == 'array' || ve_ps[vep].type == 'object') && ve_ps[vep].items != null) {
                             var vep_bodys = ve_ps[vep].items;
                             if (!jQuery.isEmptyObject(vep_bodys)) {
                                 html += '<tr><td></td> <td colspan="2" style="padding: 0"><table class="table table-bordered" style="margin: 0">';
-                                html += '<thead><tr><th width="20%">参数类型</th><th width="30%">参数名称</th><th>参数描述</th></tr></thead><tbody>';
+                                html += '<thead><tr><th width="20%">参数类型</th><th width="25%">参数名称</th><th>参数描述</th></tr></thead><tbody>';
                                 for (var vepb = 0; vepb < vep_bodys.length; vepb++) {
                                     html += '<tr><td>' + vep_bodys[vepb].type + '</td><td>' + vep_bodys[vepb].name + '</td><td>' + vep_bodys[vepb].description + '</td>';
+                                    if (vep_bodys[vepb].items != null && vep_bodys[vepb].items.length > 0) {
+                                        var citems = vep_bodys[vepb].items;
+                                        html += '<tr><td></td> <td colspan="2" style="padding: 0"><table class="table table-bordered" style="margin: 0">';
+                                        html += '<thead><tr><th width="20%">参数类型</th><th width="25%">参数名称</th><th>参数描述</th></tr></thead><tbody>';
+                                        for (var citemsi = 0; citemsi < citems.length; citemsi++) {
+                                            html += '<tr><td>' + citems[citemsi].type + '</td><td>' + citems[citemsi].name + '</td><td>' + citems[citemsi].description + '</td>';
+                                        }
+                                        html += '</tbody></table></td></tr>';
+                                    }
                                 }
                                 html += '</tbody></table></td></tr>';
                             }
@@ -623,8 +630,7 @@ function tryItOut(obj) {
             trHtml += '<td><input class="form-control" value=\'' + (param.default == null ? "" : param.default) + '\' type="text"></td>';
             trHtml += '<td><span class="btn btn-xs btn-danger" onclick="removeRequestParam(this)">移除</span></td>';
             trHtml += '</tr>';
-
-            if (param.vendorExtensions != null && param.vendorExtensions.items.length > 0) {
+            if (param.explain != null && param.explain.items != null && param.explain.items.length > 0) {
                 console.log(param)
                 trHtml += '<tr><td></td><td colspan="3">';
                 trHtml += '<div class="table-responsive"><table class="table table-bordered">' +
@@ -637,8 +643,8 @@ function tryItOut(obj) {
                     '</tr>' +
                     '</thead>';
                 trHtml += '<tbody>';
-                for (var j = 0; j < param.vendorExtensions.items.length; j++) {
-                    var items = param.vendorExtensions.items[j];
+                for (var j = 0; j < param.explain.items.length; j++) {
+                    var items = param.explain.items[j];
                     trHtml += '<tr>';
                     trHtml += '<td><input class="form-control" value=\'' + items.type + '\' type="text"></td>';
                     trHtml += '<td><input class="form-control" value=\'' + items.name + '\' type="text"></td>';

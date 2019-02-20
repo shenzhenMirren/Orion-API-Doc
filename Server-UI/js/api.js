@@ -60,8 +60,8 @@ function updateApi() {
     if (api.responses == null) {
         api.responses = "[]";
     }
-    if (api.vendorExtensions == null) {
-        api.vendorExtensions = "{}";
+    if (api.explain == null) {
+        api.explain = "{}";
     }
     if (IS_DEBUG_ENABLED) {
         console.log('API data is:');

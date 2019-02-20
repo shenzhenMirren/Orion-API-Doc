@@ -74,7 +74,7 @@ function getResponseParameterTableHtml(typeValue, name, description, items) {
             items = [];
         }
         for (var i = 0; i < items.length; i++) {
-            html += getResponseParameterTableHtml(items[i].type, items[i].name, items[i].description);
+            html += getResponseParameterTableHtml(items[i].type, items[i].name, items[i].description,items[i].items);
         }
         html += '</tbody>' +
             '</table>' +
@@ -588,7 +588,7 @@ function getApiInfo() {
             }
 
             if (!jQuery.isEmptyObject(ve)) {
-                it.vendorExtensions = ve;
+                it.explain = ve;
             }
             item.push(it);
         }
@@ -598,7 +598,7 @@ function getApiInfo() {
     }
     //请求参数 end
 
-    //请求参数 begin
+    //响应参数 begin
     var trs = $("#response_tablebody").children();
     console.log(trs)
     var responses = [];
@@ -617,13 +617,31 @@ function getApiInfo() {
                 var c_items = [];
                 for (var ct = 0; ct < c_trs.length; ct++) {
                     var c_name = c_trs[ct].children[1].children[0].value;
-                    if (c_name != '') {
+                    if (c_name !== '') {
                         var c_item = {};
                         var c_type = c_trs[ct].children[0].children[0].value;
                         var c_desc = c_trs[ct].children[2].children[0].value;
                         c_item.type = c_type;
                         c_item.name = c_name;
                         c_item.description = c_desc;
+                        if (c_type == TYPE_ARRAY || c_type == TYPE_OBJECT) {
+                            ct = ct + 1;
+                            var cc_trs = c_trs[ct].children[1].children[0].children[0].children[1].children;
+                            var cc_items = [];
+                            for (var cct = 0; cct < cc_trs.length; cct++) {
+                                var cc_name = cc_trs[cct].children[1].children[0].value;
+                                if (cc_name !== '') {
+                                    var cc_item = {};
+                                    var cc_type = cc_trs[cct].children[0].children[0].value;
+                                    var cc_desc = cc_trs[cct].children[2].children[0].value;
+                                    cc_item.type = cc_type;
+                                    cc_item.name = cc_name;
+                                    cc_item.description = cc_desc;
+                                    cc_items.push(cc_item);
+                                }
+                            }
+                            c_item.items=cc_items;
+                        }
                         c_items.push(c_item);
                     }
                 }
@@ -634,6 +652,7 @@ function getApiInfo() {
             responses.push(item);
         }
     }
+    console.log(responses)
     if (responses.length > 0) {
         data.responses = JSON.stringify(responses);
     }
@@ -712,8 +731,8 @@ function loadApiUpdateInfo(aid) {
                     if (parm[p].pattern != null) {
                         attr.pattern = parm[p].pattern;
                     }
-                    if (parm[p].vendorExtensions != null) {
-                        var ve = parm[p].vendorExtensions;
+                    if (parm[p].explain != null) {
+                        var ve = parm[p].explain;
                         if (ve.min != null) {
                             attr.min = ve.min;
                         }

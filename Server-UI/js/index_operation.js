@@ -220,10 +220,10 @@ function loadApiGroupAndApiOpblack(items) {
                             '<table class="table table-bordered">' +
                             '<thead>' +
                             '<tr>' +
-                            '<th width="30px" class="text-align-center">是否必填</th>' +
-                            '<th>参数位置</th>' +
-                            '<th>参数类型</th>' +
-                            '<th>参数名称</th>' +
+                            '<th width="6%" class="text-align-center">是否必填</th>' +
+                            '<th width="12%">参数位置</th>' +
+                            '<th width="12%">参数类型</th>' +
+                            '<th width="20%">参数名称</th>' +
                             '<th>参数描述</th>' +
                             '</tr>' +
                             '</thead>' +
@@ -261,8 +261,8 @@ function loadApiGroupAndApiOpblack(items) {
                                 }
                                 txtParamExplain += '</span>';
                             }
-                            if (parameters[j].vendorExtensions != null) {
-                                var ve = parameters[j].vendorExtensions;
+                            if (parameters[j].explain != null) {
+                                var ve = parameters[j].explain;
                                 if (ve.min != null && ve.min != '') {
                                     isAddParamExplain = true;
                                     txtParamExplain += '<span class="pull-left background-color-white radius5px mleft10px pd5px10px inline-block">最小: ' + ve.min + '</span>';
@@ -281,8 +281,8 @@ function loadApiGroupAndApiOpblack(items) {
                                 isAddParamExplain = true;
                                 txtParamExplain += '<span class="background-color-white radius5px mleft10px pd5px10px mb5px inline-block ">格式类型: ' + parameters[j].format + '</span>';
                             }
-                            if (parameters[j].vendorExtensions != null && parameters[j].vendorExtensions.items != null) {
-                                var p_items = parameters[j].vendorExtensions.items;
+                            if (parameters[j].explain != null && parameters[j].explain.items != null) {
+                                var p_items = parameters[j].explain.items;
                                 if (p_items.length > 0) {
                                     isAddParamExplain = true;
                                     txtParamExplain +=
@@ -357,9 +357,18 @@ function loadApiGroupAndApiOpblack(items) {
                                 var vep_bodys = ve_ps[vep].items;
                                 if (!jQuery.isEmptyObject(vep_bodys)) {
                                     txt += '<tr><td></td> <td colspan="2" class="pall0px"><table class="table table-bordered mall0px">';
-                                    txt += '<thead><tr><th width="20%">参数类型</th><th width="20%">参数名称</th><th>参数描述</th></tr></thead><tbody>';
+                                    txt += '<thead><tr><th width="15%">参数类型</th><th width="20%">参数名称</th><th>参数描述</th></tr></thead><tbody>';
                                     for (var vepb = 0; vepb < vep_bodys.length; vepb++) {
                                         txt += '<tr><td>' + vep_bodys[vepb].type + '</td><td>' + vep_bodys[vepb].name + '</td><td>' + vep_bodys[vepb].description + '</td>';
+                                        if (vep_bodys[vepb].items != null && vep_bodys[vepb].items.length > 0) {
+                                            var citems = vep_bodys[vepb].items;
+                                            txt += '<tr><td></td> <td colspan="2" class="pall0px"><table class="table table-bordered mall0px">';
+                                            txt += '<thead><tr><th width="15%">参数类型</th><th width="20%">参数名称</th><th>参数描述</th></tr></thead><tbody>';
+                                            for (var citemsi = 0; citemsi < citems.length; citemsi++) {
+                                                txt += '<tr><td>' + citems[citemsi].type + '</td><td>' + citems[citemsi].name + '</td><td>' + citems[citemsi].description + '</td>';
+                                            }
+                                            txt += '</tbody></table></td></tr>';
+                                        }
                                     }
                                     txt += '</tbody></table></td></tr>';
                                 }
